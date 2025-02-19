@@ -1,12 +1,11 @@
-from typing import Optional
+from sqlmodel import SQLModel
 
-from pydantic import BaseModel
+from app.schemas.user import UserPubic
 
 
 # Shared properties
-class ItemBase(BaseModel):
-    title: Optional[str] = None
-    description: Optional[str] = None
+class ItemBase(SQLModel):
+    title: str | None = None
 
 
 # Properties to receive on item creation
@@ -25,15 +24,11 @@ class ItemInDBBase(ItemBase):
     title: str
     owner_id: int
 
-    class Config:
-        orm_mode = True
-
 
 # Properties to return to client
-class Item(ItemInDBBase):
-    pass
+class ItemPublic(ItemInDBBase):
+    owner: UserPubic
 
 
-# Properties properties stored in DB
-class ItemInDB(ItemInDBBase):
-    pass
+class ItemList(SQLModel):
+    data: list[ItemPublic]

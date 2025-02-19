@@ -1,13 +1,23 @@
 import secrets
-from typing import List, Union
+from typing import List, Literal
 
-from pydantic import BaseSettings, AnyHttpUrl, validator, EmailStr
+from pydantic import AnyHttpUrl, EmailStr
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from dotenv import load_dotenv
+
 
 load_dotenv()
 
 
 class Settings(BaseSettings):
+
+    model_config = SettingsConfigDict(
+        # Use top level .env file (one level above ./backend/)
+        env_file="../.env",
+        env_ignore_empty=True,
+        extra="ignore",
+    )
+
     API_V1_STR: str = "/api/v1"
     SECRET_KEY: str = secrets.token_urlsafe(32)
     # 60 minutes * 24 hours * 8 days = 8 days
@@ -18,14 +28,7 @@ class Settings(BaseSettings):
     # e.g: '["http://localhost", "http://localhost:4200", "http://localhost:3000", \
     # "http://localhost:8080", "http://local.dockertoolbox.tiangolo.com"]'
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = []
-
-    @validator("BACKEND_CORS_ORIGINS", pre=True)
-    def assemble_cors_origins(cls, v: Union[str, List[str]]) -> Union[List[str], str]:
-        if isinstance(v, str) and not v.startswith("["):
-            return [i.strip() for i in v.split(",")]
-        elif isinstance(v, (list, str)):
-            return v
-        raise ValueError(v)
+    ENVIRONMENT: Literal["local", "staging", "production"] = "local"
 
     PROJECT_NAME: str
 
@@ -35,12 +38,9 @@ class Settings(BaseSettings):
     SQLALCHEMY_DATABASE_URI: str = None
 
     EMAIL_TEST_USER: EmailStr = "test@example.com"  # type: ignore
-    FIRST_SUPERUSER: EmailStr = 'test@example.com'
-    FIRST_SUPERUSER_PASSWORD: str = 'admin'
+    FIRST_SUPERUSER: EmailStr = "test@example.com"
+    FIRST_SUPERUSER_PASSWORD: str = "admin"
     USERS_OPEN_REGISTRATION: bool = False
-
-    class Config:
-        case_sensitive = True
 
 
 settings = Settings()

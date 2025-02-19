@@ -1,12 +1,11 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
-from sqlalchemy.orm import relationship
-
-from app.db.base_class import Base
+from sqlmodel import SQLModel, Field, Relationship
+from .user import User
 
 
-class Item(Base):
-    id = Column(Integer, autoincrement=True, primary_key=True, index=True)
-    title = Column(String(12), index=True)
-    description = Column(String(20), index=True)
-    owner_id = Column(Integer, ForeignKey("user.id"))
-    owner = relationship("User", back_populates="items")
+class Item(SQLModel, table=True):
+
+    id: int | None = Field(primary_key=True, default=None)
+    title: str = Field(max_length=255)
+    owner_id: int = Field(foreign_key="user.id", nullable=False, ondelete="CASCADE")
+
+    owner: User | None = Relationship(back_populates="items")

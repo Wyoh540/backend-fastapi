@@ -1,13 +1,11 @@
-from typing import Optional, List
-
-from pydantic import BaseModel
+from sqlmodel import SQLModel
 
 
-class Token(BaseModel):
+class Token(SQLModel):
     access_token: str
-    token_type: str
+    token_type: str = "bearer"
 
 
-class TokenPayload(BaseModel):
-    sub: Optional[int] = None
-    scopes: List[str] = []
+class TokenPayload(SQLModel):
+    sub: int | None = None
+    scopes: list[str] = []

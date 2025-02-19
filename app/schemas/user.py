@@ -1,14 +1,13 @@
-from typing import Optional
-
-from pydantic import BaseModel, EmailStr
+from pydantic import EmailStr
+from sqlmodel import SQLModel
 
 
 # Shared properties
-class UserBase(BaseModel):
-    email: Optional[EmailStr] = None
-    is_active: Optional[bool] = True
+class UserBase(SQLModel):
+    email: EmailStr | None = None
+    is_active: bool = True
     is_superuser: bool = False
-    full_name: Optional[str] = None
+    full_name: str | None = None
 
 
 # Properties to receive via API on creation
@@ -19,14 +18,11 @@ class UserCreate(UserBase):
 
 # Properties to receive via API on update
 class UserUpdate(UserBase):
-    password: Optional[str] = None
+    password: str | None = None
 
 
 class UserInDBBase(UserBase):
-    id: Optional[int] = None
-
-    class Config:
-        orm_mode = True
+    id: int | int = None
 
 
 # Additional properties to return via API
@@ -37,3 +33,15 @@ class User(UserInDBBase):
 # Additional properties stored in DB
 class UserInDB(UserInDBBase):
     hashed_password: str
+
+
+class UserPubic(SQLModel):
+    id: int | None = None
+    email: EmailStr | None = None
+    is_active: bool = True
+    is_superuser: bool = False
+    full_name: str | None = None
+
+
+class UsersPublic(SQLModel):
+    data: list[UserPubic]

@@ -1,14 +1,14 @@
-from sqlalchemy import Column, Integer, String, Boolean
-from sqlalchemy.orm import relationship
-
-from app.db.base_class import Base
+from sqlmodel import SQLModel, Relationship, Field
+from pydantic import EmailStr
 
 
-class User(Base):
-    id = Column(Integer, primary_key=True, index=True)
-    full_name = Column(String(20), index=True)
-    email = Column(String(40), unique=True, index=True, nullable=False)
-    hashed_password = Column(String(255), nullable=False)
-    is_active = Column(Boolean(), default=True)
-    is_superuser = Column(Boolean(), default=False)
-    items = relationship("Item", back_populates="owner")
+class User(SQLModel, table=True):
+
+    id: int | None = Field(primary_key=True, default=None)
+    full_name: str | None = Field(max_length=255, default=None)
+    email: EmailStr = Field(max_length=255, index=True, unique=True)
+    hashed_password: str
+    is_active: bool = True
+    is_superuser: bool = False
+
+    items: list["Item"] = Relationship(back_populates="owner", cascade_delete=True)
