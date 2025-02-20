@@ -42,5 +42,7 @@ class Settings(BaseSettings):
     FIRST_SUPERUSER_PASSWORD: str = "admin"
     USERS_OPEN_REGISTRATION: bool = False
 
+    REDIS_BROKER_URL: str = None
+
 
 settings = Settings()

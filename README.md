@@ -13,3 +13,11 @@ alembic revision --autogenerate -m "init db"
 ```bash
 alembic upgrade head
 ```
+
+## 工程启动
+
+启动celery worker
+
+```bash
+celery -A app.celery worker -p solo --concurrency=2  --loglevel=INFO
+```

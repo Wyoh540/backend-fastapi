@@ -5,3 +5,6 @@ report
 **versions**
 .idea
 **__pycache__**
+
+# database
+sql_app.db
