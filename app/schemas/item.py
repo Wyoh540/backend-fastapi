@@ -1,5 +1,5 @@
 from sqlmodel import SQLModel
-from pydantic import field_serializer
+from pydantic import field_serializer, model_serializer
 
 from app.schemas.user import UserPubic
 
@@ -32,9 +32,9 @@ class ItemPublic(ItemInDBBase):
     owner: UserPubic
     tags: list["TagName"]
 
-    @field_serializer("tags")
-    def serialize_tags(self, tags: "TagName"):
-        return [tag.name for tag in tags]
+    # @field_serializer("tags")  # 字段序列化
+    # def serialize_tags(self, tags: "TagName"):
+    #     return [tag.name for tag in tags]
 
 
 class ItemList(SQLModel):
@@ -48,6 +48,10 @@ class Tag(SQLModel):
 
 class TagName(SQLModel):
     name: str
+
+    @model_serializer  # 模型序列化
+    def ser_model(self) -> str:
+        return self.name
 
 
 class TagList(SQLModel):

@@ -1,5 +1,12 @@
 # FastAPI 示例工程
 
+## 核心依赖
+
+* [Pydantic](https://docs.pydantic.dev/2.10/)
+* [SQLModel](https://sqlmodel.fastapi.org.cn/)
+* [Alembic](https://alembic.sqlalchemy.org/en/latest/)
+* [Celery](https://docs.celeryq.dev/en/stable/index.html)
+
 ## 数据库
 
 生成迁移数据
