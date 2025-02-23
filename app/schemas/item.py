@@ -1,4 +1,5 @@
 from sqlmodel import SQLModel
+from pydantic import field_serializer
 
 from app.schemas.user import UserPubic
 
@@ -11,6 +12,7 @@ class ItemBase(SQLModel):
 # Properties to receive on item creation
 class ItemCreate(ItemBase):
     title: str
+    tags: list[str] = None
 
 
 # Properties to receive on item update
@@ -28,7 +30,25 @@ class ItemInDBBase(ItemBase):
 # Properties to return to client
 class ItemPublic(ItemInDBBase):
     owner: UserPubic
+    tags: list["TagName"]
+
+    @field_serializer("tags")
+    def serialize_tags(self, tags: "TagName"):
+        return [tag.name for tag in tags]
 
 
 class ItemList(SQLModel):
     data: list[ItemPublic]
+
+
+class Tag(SQLModel):
+    id: int
+    name: str
+
+
+class TagName(SQLModel):
+    name: str
+
+
+class TagList(SQLModel):
+    data: list[Tag] = []

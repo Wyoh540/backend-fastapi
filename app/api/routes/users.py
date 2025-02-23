@@ -7,7 +7,6 @@ from app.models import User
 from app.core.security import get_password_hash
 from app.api.deps import SessionDep
 from app.schemas import UsersPublic, UserCreate, UserPubic
-from app.task import task
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -16,7 +15,6 @@ router = APIRouter(prefix="/users", tags=["users"])
 def get_users(session: SessionDep) -> Any:
     statement = select(User)
     users = session.exec(statement).all()
-    task.hello.delay()
     return UsersPublic(data=users)
 
 
