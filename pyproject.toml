@@ -9,6 +9,7 @@ dependencies = [
     "bcrypt==4.0.1",
     "celery[redis]>=5.4.0",
     "fastapi<1.0.0,>=0.115.6",
+    "fastapi-pagination>=0.12.34",
     "passlib[bcrypt]>=1.7.4",
     "pydantic-settings>=2.7.1",
     "pydantic[email]>=2.10.5",

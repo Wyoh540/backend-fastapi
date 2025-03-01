@@ -1,20 +1,21 @@
 from fastapi import APIRouter, status
 from fastapi.exceptions import HTTPException
+from fastapi_pagination.ext.sqlmodel import paginate
+from fastapi_pagination import Page
 from sqlmodel import select
 
 from app.api.deps import SessionDep, CurrentUser
 from app.services.item import TagManage
 from app.models import Item, Tag
-from app.schemas import ItemList, ItemCreate, ItemPublic, TagList, ItemUpdate
+from app.schemas import ItemCreate, ItemPublic, TagList, ItemUpdate
 
 router = APIRouter(prefix="/items", tags=["items"])
 
 
-@router.get("/", response_model=ItemList)
+@router.get("/", response_model=Page[ItemPublic])
 def get_items(session: SessionDep):
     statement = select(Item)
-    items = session.exec(statement).all()
-    return ItemList(data=items)
+    return paginate(session, statement)
 
 
 @router.post("/", response_model=ItemPublic)

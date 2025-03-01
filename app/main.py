@@ -7,6 +7,7 @@ from fastapi.openapi.docs import (
     get_swagger_ui_oauth2_redirect_html,
 )
 from fastapi.staticfiles import StaticFiles
+from fastapi_pagination import add_pagination
 
 from app.api.main import api_router
 from app.core.config import settings
@@ -60,4 +61,8 @@ if settings.all_cors_origins:
         allow_headers=["*"],
     )
 
+# 分页
+add_pagination(app)
+
+# 路由
 app.include_router(api_router, prefix=settings.API_V1_STR)
