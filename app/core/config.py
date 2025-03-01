@@ -1,12 +1,20 @@
 import secrets
-from typing import List, Literal
+from typing import Literal, Any, Annotated
 
-from pydantic import AnyHttpUrl, EmailStr
+from pydantic import AnyHttpUrl, EmailStr, AnyUrl, BeforeValidator, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from dotenv import load_dotenv
 
 
 load_dotenv()
+
+
+def parse_cors(v: Any) -> list[str] | str:
+    if isinstance(v, str) and not v.startswith("["):
+        return [i.strip() for i in v.split(",")]
+    elif isinstance(v, list | str):
+        return v
+    raise ValueError(v)
 
 
 class Settings(BaseSettings):
@@ -18,19 +26,24 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
+    PROJECT_NAME: str
     API_V1_STR: str = "/api/v1"
     SECRET_KEY: str = secrets.token_urlsafe(32)
     # 60 minutes * 24 hours * 8 days = 8 days
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
     SERVER_NAME: str
     SERVER_HOST: AnyHttpUrl
+    FRONTEND_HOST: str = "http://localhost:3000"
     # BACKEND_CORS_ORIGINS is a JSON-formatted list of origins
     # e.g: '["http://localhost", "http://localhost:4200", "http://localhost:3000", \
     # "http://localhost:8080", "http://local.dockertoolbox.tiangolo.com"]'
-    BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = []
+    BACKEND_CORS_ORIGINS: Annotated[list[AnyUrl] | str, BeforeValidator(parse_cors)]
     ENVIRONMENT: Literal["local", "staging", "production"] = "local"
 
-    PROJECT_NAME: str
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def all_cors_origins(self) -> list[str]:
+        return [str(origin).rstrip("/") for origin in self.BACKEND_CORS_ORIGINS] + [self.FRONTEND_HOST]
 
     # sqlite: sqlite:///./sql_app.db
     # postgresql: postgresql://user:password@postgresserver/db
