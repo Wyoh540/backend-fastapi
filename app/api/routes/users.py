@@ -5,7 +5,7 @@ from sqlmodel import select
 
 from app.models import User
 from app.core.security import get_password_hash
-from app.api.deps import SessionDep
+from app.api.deps import SessionDep, CurrentUser
 from app.schemas import UsersPublic, UserCreate, UserPubic
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -27,3 +27,8 @@ def create_user(session: SessionDep, user_in: UserCreate) -> Any:
     session.commit()
     session.refresh(user)
     return user
+
+
+@router.get("/me", response_model=UserPubic)
+def get_user_me(current_user: CurrentUser) -> Any:
+    return current_user

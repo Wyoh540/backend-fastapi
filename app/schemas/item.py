@@ -1,5 +1,5 @@
 from sqlmodel import SQLModel
-from pydantic import field_serializer, model_serializer
+from pydantic import model_serializer
 
 from app.schemas.user import UserPubic
 
