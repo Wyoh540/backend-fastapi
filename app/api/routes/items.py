@@ -7,7 +7,7 @@ from sqlmodel import select
 from app.api.deps import SessionDep, CurrentUser
 from app.services.item import TagManage
 from app.models import Item, Tag
-from app.schemas import ItemCreate, ItemPublic, TagList, ItemUpdate
+from app.schemas import ItemCreate, ItemPublic, ItemUpdate
 
 router = APIRouter(prefix="/items", tags=["items"])
 
@@ -50,8 +50,8 @@ def update_item(session: SessionDep, current_user: CurrentUser, item_id: int, it
     return db_item
 
 
-@router.get("/tags/", response_model=TagList)
+@router.get("/tags/", response_model=list[Tag])
 def get_item_tags(session: SessionDep):
     statement = select(Tag)
     tags = session.exec(statement).all()
-    return TagList(data=tags)
+    return tags
