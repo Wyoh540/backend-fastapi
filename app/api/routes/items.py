@@ -35,7 +35,7 @@ def create_item(session: SessionDep, current_user: CurrentUser, item_obj: ItemCr
     return item
 
 
-@router.patch("/", response_model=ItemPublic)
+@router.patch("/{item_id}", response_model=ItemPublic)
 def update_item(session: SessionDep, current_user: CurrentUser, item_id: int, item_obj: ItemUpdate):
     db_item = session.exec(select(Item).where(Item.id == item_id)).first()
     if not db_item:
@@ -46,6 +46,18 @@ def update_item(session: SessionDep, current_user: CurrentUser, item_id: int, it
     session.add(db_item)
     session.commit()
     session.refresh(db_item)
+
+    return db_item
+
+
+@router.delete("/{item_id}", response_model=ItemPublic)
+def delete_item(session: SessionDep, current_user: CurrentUser, item_id: int):
+    db_item = session.get(Item, item_id)
+    if not db_item:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="item not found")
+
+    session.delete(db_item)
+    session.commit()
 
     return db_item
 
