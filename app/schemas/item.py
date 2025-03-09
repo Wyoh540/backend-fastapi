@@ -17,7 +17,7 @@ class ItemCreate(ItemBase):
 
 # Properties to receive on item update
 class ItemUpdate(ItemBase):
-    pass
+    tags: list[str] = None
 
 
 # Properties shared by models stored in DB

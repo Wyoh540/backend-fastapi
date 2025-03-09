@@ -42,7 +42,14 @@ def update_item(session: SessionDep, current_user: CurrentUser, item_id: int, it
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="item not found")
 
     item_data = item_obj.model_dump(exclude_unset=True)
+    tags = item_data.pop("tags")
     db_item.sqlmodel_update(item_data, update={"owner_id": current_user.id})
+    if tags is not None:
+        item_tag_list = []
+        for tag in tags:
+            tag_obj = TagManage.get_or_create_tag(session, tag)
+            item_tag_list.append(tag_obj)
+        db_item.tags = item_tag_list
     session.add(db_item)
     session.commit()
     session.refresh(db_item)
