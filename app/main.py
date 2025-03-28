@@ -21,6 +21,8 @@ app = FastAPI(
     title=settings.PROJECT_NAME,
     generate_unique_id_function=custom_generate_unique_id,
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
+    docs_url=None,
+    redoc_url=None,
 )
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
