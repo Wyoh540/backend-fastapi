@@ -1,4 +1,6 @@
-from fastapi import APIRouter, status
+from typing import Any
+
+from fastapi import APIRouter, status, Query
 from fastapi.exceptions import HTTPException
 from fastapi_pagination.ext.sqlmodel import paginate
 from fastapi_pagination import Page
@@ -13,13 +15,13 @@ router = APIRouter(prefix="/items", tags=["items"])
 
 
 @router.get("/", response_model=Page[ItemPublic])
-def get_items(session: SessionDep):
-    statement = select(Item)
+def get_items(session: SessionDep, status: Item.StatusEnum = Query(..., description="按状态过滤")) -> Any:
+    statement = select(Item).where(Item.status == status)
     return paginate(session, statement)
 
 
 @router.post("/", response_model=ItemPublic)
-def create_item(session: SessionDep, current_user: CurrentUser, item_obj: ItemCreate):
+def create_item(session: SessionDep, current_user: CurrentUser, item_obj: ItemCreate) -> Any:
 
     # item = Item.model_validate(item_obj, update={"owner_id": current_user.id})
     item_tag_list = []
@@ -36,7 +38,7 @@ def create_item(session: SessionDep, current_user: CurrentUser, item_obj: ItemCr
 
 
 @router.patch("/{item_id}", response_model=ItemPublic)
-def update_item(session: SessionDep, current_user: CurrentUser, item_id: int, item_obj: ItemUpdate):
+def update_item(session: SessionDep, current_user: CurrentUser, item_id: int, item_obj: ItemUpdate) -> Any:
     db_item = session.exec(select(Item).where(Item.id == item_id)).first()
     if not db_item:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="item not found")
@@ -58,7 +60,7 @@ def update_item(session: SessionDep, current_user: CurrentUser, item_id: int, it
 
 
 @router.delete("/{item_id}", response_model=ItemPublic)
-def delete_item(session: SessionDep, current_user: CurrentUser, item_id: int):
+def delete_item(session: SessionDep, current_user: CurrentUser, item_id: int) -> Any:
     db_item = session.get(Item, item_id)
     if not db_item:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="item not found")
@@ -70,7 +72,7 @@ def delete_item(session: SessionDep, current_user: CurrentUser, item_id: int):
 
 
 @router.get("/tags/", response_model=list[Tag])
-def get_item_tags(session: SessionDep):
+def get_item_tags(session: SessionDep) -> Any:
     statement = select(Tag)
     tags = session.exec(statement).all()
     return tags

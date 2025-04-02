@@ -1,19 +1,8 @@
-from enum import Enum
-
-from sqlmodel import SQLModel, Field, Column, Integer
+from sqlmodel import SQLModel
 from pydantic import model_serializer
 
 from app.schemas.user import UserPubic
-
-
-# Shared properties
-class ItemBase(SQLModel):
-    class StatusEnum(int, Enum):
-        ONLINE = 1
-        OFFLINE = 2
-
-    title: str | None = None
-    status: StatusEnum = Field(sa_column=Column(Integer), default=StatusEnum.ONLINE)
+from app.models import ItemBase
 
 
 # Properties to receive on item creation
@@ -36,6 +25,7 @@ class ItemInDBBase(ItemBase):
 
 # Properties to return to client
 class ItemPublic(ItemInDBBase):
+    status_display: str
     owner: UserPubic
     tags: list["TagName"]
 
