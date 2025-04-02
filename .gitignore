@@ -2,7 +2,6 @@
 .env
 **.pytest_cache**
 report
-**versions**
 .idea
 **__pycache__**
 

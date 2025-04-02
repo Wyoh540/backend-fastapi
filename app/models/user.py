@@ -1,5 +1,11 @@
+from typing import TYPE_CHECKING
+
 from sqlmodel import SQLModel, Relationship, Field
 from pydantic import EmailStr
+
+
+if TYPE_CHECKING:
+    from .item import Item
 
 
 class User(SQLModel, table=True):
