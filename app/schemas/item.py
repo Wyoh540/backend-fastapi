@@ -1,4 +1,6 @@
-from sqlmodel import SQLModel
+from enum import Enum
+
+from sqlmodel import SQLModel, Field, Column, Integer
 from pydantic import model_serializer
 
 from app.schemas.user import UserPubic
@@ -6,18 +8,23 @@ from app.schemas.user import UserPubic
 
 # Shared properties
 class ItemBase(SQLModel):
+    class StatusEnum(int, Enum):
+        ONLINE = 1
+        OFFLINE = 2
+
     title: str | None = None
+    status: StatusEnum = Field(sa_column=Column(Integer), default=StatusEnum.ONLINE)
 
 
 # Properties to receive on item creation
 class ItemCreate(ItemBase):
     title: str
-    tags: list[str] = None
+    tags: list[str] = []
 
 
 # Properties to receive on item update
 class ItemUpdate(ItemBase):
-    tags: list[str] = None
+    tags: list[str] = []
 
 
 # Properties shared by models stored in DB

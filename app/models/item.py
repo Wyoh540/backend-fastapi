@@ -1,4 +1,6 @@
-from sqlmodel import SQLModel, Field, Relationship
+from enum import Enum
+
+from sqlmodel import SQLModel, Field, Relationship, Column, Integer
 from .user import User
 
 
@@ -11,9 +13,14 @@ class ItemTagLink(SQLModel, table=True):
 
 class Item(SQLModel, table=True):
 
+    class StatusEnum(int, Enum):
+        ONLINE = 1
+        OFFLINE = 2
+
     id: int | None = Field(primary_key=True, default=None)
     title: str = Field(max_length=255)
     owner_id: int = Field(foreign_key="user.id", nullable=False, ondelete="CASCADE")
+    status: StatusEnum = Field(sa_column=Column(Integer), default=StatusEnum.ONLINE)
 
     owner: User | None = Relationship(back_populates="items")
     tags: list["Tag"] = Relationship(back_populates="items", link_model=ItemTagLink)
