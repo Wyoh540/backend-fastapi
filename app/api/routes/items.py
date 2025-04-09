@@ -7,7 +7,7 @@ from fastapi_pagination import Page
 from sqlmodel import select
 
 from app.api.deps import SessionDep, CurrentUser
-from app.services.item import TagManage
+from app.services.item import TagManage, ItemService
 from app.models import Item, Tag
 from app.schemas import ItemCreate, ItemPublic, ItemUpdate
 
@@ -39,12 +39,12 @@ def create_item(session: SessionDep, current_user: CurrentUser, item_obj: ItemCr
 
 @router.patch("/{item_id}", response_model=ItemPublic)
 def update_item(session: SessionDep, current_user: CurrentUser, item_id: int, item_obj: ItemUpdate) -> Any:
-    db_item = session.exec(select(Item).where(Item.id == item_id)).first()
+    db_item = ItemService.get_item_by_id(db=session, item_id=item_id)
     if not db_item:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="item not found")
 
     item_data = item_obj.model_dump(exclude_unset=True)
-    tags = item_data.pop("tags")
+    tags = item_data.pop("tags", None)
     db_item.sqlmodel_update(item_data, update={"owner_id": current_user.id})
     if tags is not None:
         item_tag_list = []
@@ -61,7 +61,7 @@ def update_item(session: SessionDep, current_user: CurrentUser, item_id: int, it
 
 @router.delete("/{item_id}", response_model=ItemPublic)
 def delete_item(session: SessionDep, current_user: CurrentUser, item_id: int) -> Any:
-    db_item = session.get(Item, item_id)
+    db_item = ItemService.get_item_by_id(db=session, item_id=item_id)
     if not db_item:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="item not found")
 

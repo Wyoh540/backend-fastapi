@@ -17,6 +17,7 @@ dependencies = [
     "python-multipart>=0.0.20",
     "sqlmodel>=0.0.22",
     "uvicorn>=0.34.0",
+    "httpx>=0.28.1",
 ]
 [tool.mypy]
 strict = true

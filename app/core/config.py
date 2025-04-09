@@ -28,7 +28,8 @@ class Settings(BaseSettings):
 
     PROJECT_NAME: str
     API_V1_STR: str = "/api/v1"
-    SECRET_KEY: str = secrets.token_urlsafe(32)
+    # SECRET_KEY: str = secrets.token_urlsafe(32) 生产环境使用
+    SECRET_KEY: str = "yu_muCFbLZLRlbRUdl1WVAa91JVhHl769ptqo8GhA6c"
     # 60 minutes * 24 hours * 8 days = 8 days
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
     SERVER_NAME: str
@@ -48,14 +49,14 @@ class Settings(BaseSettings):
     # sqlite: sqlite:///./sql_app.db
     # postgresql: postgresql://user:password@postgresserver/db
     # mysql: mysql+pymysql://user:password@hostname:port/db
-    SQLALCHEMY_DATABASE_URI: str = None
+    SQLALCHEMY_DATABASE_URI: str | None = None
 
-    EMAIL_TEST_USER: EmailStr = "test@example.com"  # type: ignore
+    EMAIL_TEST_USER: EmailStr = "test@example.com"
     FIRST_SUPERUSER: EmailStr = "test@example.com"
     FIRST_SUPERUSER_PASSWORD: str = "admin"
     USERS_OPEN_REGISTRATION: bool = False
 
-    REDIS_BROKER_URL: str = None
+    REDIS_BROKER_URL: str | None = None
 
 
 settings = Settings()

@@ -17,21 +17,17 @@ class ItemBase(SQLModel):
         OFFLINE = 2
 
     title: str = Field(max_length=255)
-    owner_id: int = Field(foreign_key="user.id", nullable=False, ondelete="CASCADE")
+
     status: StatusEnum = Field(
         sa_column=Column(Integer), default=StatusEnum.ONLINE, description="1: 在线, 2: 离线"
     )
-
-    @property
-    def status_display(self) -> str:
-        STATUS_DISPLAY_MAP = {self.StatusEnum.ONLINE: "在线", self.StatusEnum.OFFLINE: "离线"}
-        return STATUS_DISPLAY_MAP.get(self.status, "未知状态")
 
 
 class Item(ItemBase, table=True):
 
     id: int | None = Field(primary_key=True, default=None)
 
+    owner_id: int = Field(foreign_key="user.id", nullable=False, ondelete="CASCADE")
     owner: User | None = Relationship(back_populates="items")
     tags: list["Tag"] = Relationship(back_populates="items", link_model=ItemTagLink)
 

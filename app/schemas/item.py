@@ -13,6 +13,7 @@ class ItemCreate(ItemBase):
 
 # Properties to receive on item update
 class ItemUpdate(ItemBase):
+    title: str | None = None
     tags: list[str] = []
 
 
@@ -20,12 +21,10 @@ class ItemUpdate(ItemBase):
 class ItemInDBBase(ItemBase):
     id: int
     title: str
-    owner_id: int
 
 
 # Properties to return to client
 class ItemPublic(ItemInDBBase):
-    status_display: str
     owner: UserPubic
     tags: list["TagName"]
 

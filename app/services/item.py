@@ -1,6 +1,7 @@
 from sqlmodel import Session, select
+from fastapi import HTTPException
 
-from app.models import Tag
+from app.models import Tag, Item
 
 
 class TagManage:
@@ -18,3 +19,15 @@ class TagManage:
 
             existing_tag = new_tag
         return existing_tag
+
+
+class ItemService:
+    """Item 服务"""
+
+    @classmethod
+    def get_item_by_id(cla, db: Session, item_id: int) -> Item:
+        """获取Item"""
+        db_item = db.get(Item, item_id)
+        if not db_item:
+            raise HTTPException(status_code=404, detail="Item not found")
+        return db_item

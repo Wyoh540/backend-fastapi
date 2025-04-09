@@ -1,7 +1,7 @@
 from typing import Dict
 
 from fastapi.testclient import TestClient
-from sqlalchemy.orm import Session
+from sqlmodel import Session
 
 from app import service
 from app.core.config import settings
