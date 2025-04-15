@@ -18,6 +18,7 @@ dependencies = [
     "sqlmodel>=0.0.22",
     "uvicorn>=0.34.0",
     "httpx>=0.28.1",
+    "fastapi-filter[sqlalchemy]>=2.0.1",
 ]
 [tool.mypy]
 strict = true

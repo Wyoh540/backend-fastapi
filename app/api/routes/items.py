@@ -1,23 +1,27 @@
 from typing import Any
 
-from fastapi import APIRouter, status, Query
+from fastapi import APIRouter, status
 from fastapi.exceptions import HTTPException
 from fastapi_pagination.ext.sqlmodel import paginate
+from fastapi_filter import FilterDepends
 from fastapi_pagination import Page
 from sqlmodel import select
 
 from app.api.deps import SessionDep, CurrentUser
 from app.services.item import TagManage, ItemService
 from app.models import Item, Tag
+from app.filters import ItemFilter
 from app.schemas import ItemCreate, ItemPublic, ItemUpdate
 
 router = APIRouter(prefix="/items", tags=["items"])
 
 
 @router.get("/", response_model=Page[ItemPublic])
-def get_items(session: SessionDep, status: Item.StatusEnum = Query(..., description="按状态过滤")) -> Any:
-    statement = select(Item).where(Item.status == status)
-    return paginate(session, statement)
+def get_items(session: SessionDep, item_filter: ItemFilter = FilterDepends(ItemFilter)) -> Any:
+    query = select(Item)
+    query = item_filter.filter(query)
+    query = item_filter.sort(query)
+    return paginate(session, query)
 
 
 @router.post("/", response_model=ItemPublic)
