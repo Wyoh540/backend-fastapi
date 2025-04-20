@@ -1,6 +1,6 @@
 from enum import Enum
 
-from sqlmodel import SQLModel, Field, Relationship, Column, Integer, Enum as SQLEnum
+from sqlmodel import SQLModel, Field, Relationship, Column, Integer
 from .user import User
 
 
@@ -13,13 +13,15 @@ class ItemTagLink(SQLModel, table=True):
 
 class ItemBase(SQLModel):
     class StatusEnum(int, Enum):
+        """状态，1: 在线, 2: 离线"""
+
         ONLINE = 1
         OFFLINE = 2
 
     title: str = Field(max_length=255)
 
     status: StatusEnum = Field(
-        sa_column=Column(SQLEnum(StatusEnum)), default=StatusEnum.ONLINE, description="1: 在线, 2: 离线"
+        sa_column=Column(Integer), default=StatusEnum.ONLINE, description="1: 在线, 2: 离线"
     )
 
 
