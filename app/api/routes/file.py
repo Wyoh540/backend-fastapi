@@ -25,7 +25,7 @@ async def create_upload_file(file: UploadFile) -> Any:
 
 @router.post("/upload-file-form/", tags=["File"], response_model=schemas.FileForm)
 async def create_file_with_form(
-    file: bytes = File(), fileb: UploadFile | None = None, token: str = Form()
+    file: bytes = File(), fileb: UploadFile | None = File(default=None), token: str = Form()
 ) -> Any:
     """表单文件上传"""
     return {
