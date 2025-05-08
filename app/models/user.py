@@ -9,7 +9,6 @@ if TYPE_CHECKING:
 
 
 class User(SQLModel, table=True):
-
     id: int | None = Field(primary_key=True, default=None)
     full_name: str | None = Field(max_length=255, default=None)
     email: EmailStr = Field(max_length=255, index=True, unique=True)
@@ -17,4 +16,7 @@ class User(SQLModel, table=True):
     is_active: bool = True
     is_superuser: bool = False
 
+    # cascade_delete 字段作用在Relationship上，在一对多关系的"多"侧，级联删除时使用，"一"侧的Field中需ondelete="CASCADE"
+    # 如果"一"侧的Field中ondelete="SET NULL", 则cascade_delete不需要配置
+    # 详细说明查看：https://sqlmodel.tiangolo.com/tutorial/relationship-attributes/cascade-delete-relationships/
     items: list["Item"] = Relationship(back_populates="owner", cascade_delete=True)

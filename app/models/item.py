@@ -19,7 +19,6 @@ class ItemStatus(int, Enum):
 
 
 class ItemBase(SQLModel):
-
     title: str = Field(max_length=255)
 
     status: ItemStatus = Field(
@@ -28,9 +27,9 @@ class ItemBase(SQLModel):
 
 
 class Item(ItemBase, table=True):
-
     id: int | None = Field(primary_key=True, default=None)
 
+    # ondelete="CASCADE" 表示数据库级联删除, 在Field中使用，在一对多关系的多侧
     owner_id: int = Field(foreign_key="user.id", nullable=False, ondelete="CASCADE")
     owner: User | None = Relationship(back_populates="items")
     tags: list["Tag"] = Relationship(back_populates="items", link_model=ItemTagLink)
