@@ -1,8 +1,8 @@
-from sqlmodel import SQLModel
+from sqlmodel import SQLModel, Field, Column, Integer
 from pydantic import model_serializer
 
 from app.schemas.user import UserPubic
-from app.models import ItemBase
+from app.models import ItemBase, ItemStatus
 
 
 # Properties to receive on item creation
@@ -12,9 +12,13 @@ class ItemCreate(ItemBase):
 
 
 # Properties to receive on item update
-class ItemUpdate(ItemBase):
-    title: str | None = None
+class ItemUpdate(SQLModel):
+    title: str | None = Field(default=None, max_length=255)
     tags: list[str] = []
+
+    status: ItemStatus = Field(
+        sa_column=Column(Integer), default=ItemStatus.ONLINE.value, description="1: 在线, 2: 离线"
+    )
 
 
 # Properties shared by models stored in DB

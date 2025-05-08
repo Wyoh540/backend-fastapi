@@ -11,17 +11,19 @@ class ItemTagLink(SQLModel, table=True):
     tag_id: int | None = Field(foreign_key="tag.id", primary_key=True, default=None)
 
 
-class ItemBase(SQLModel):
-    class StatusEnum(int, Enum):
-        """状态，1: 在线, 2: 离线"""
+class ItemStatus(int, Enum):
+    """状态，1: 在线, 2: 离线"""
 
-        ONLINE = 1
-        OFFLINE = 2
+    ONLINE = 1
+    OFFLINE = 2
+
+
+class ItemBase(SQLModel):
 
     title: str = Field(max_length=255)
 
-    status: StatusEnum = Field(
-        sa_column=Column(Integer), default=StatusEnum.ONLINE, description="1: 在线, 2: 离线"
+    status: ItemStatus = Field(
+        sa_column=Column(Integer), default=ItemStatus.ONLINE.value, description="1: 在线, 2: 离线"
     )
 
 
