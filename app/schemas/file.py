@@ -1,4 +1,8 @@
+import uuid
+
 from sqlmodel import SQLModel
+
+from app.models.file import FileBase
 
 
 class File(SQLModel):
@@ -7,12 +11,10 @@ class File(SQLModel):
     file_size: int
 
 
-class UploadFile(SQLModel):
+class UploadFile(FileBase):
     """UploadFile响应模型"""
 
-    file_name: str | None
-    file_size: int | None
-    content_type: str | None
+    id: uuid.UUID
 
 
 class FileForm(SQLModel):

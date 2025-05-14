@@ -7,3 +7,6 @@ report
 
 # database
 sql_app.db
+
+# 文件上传路径
+uploads/

@@ -1,7 +1,7 @@
-import secrets
 from typing import Literal, Any, Annotated
+from pathlib import Path
 
-from pydantic import AnyHttpUrl, EmailStr, AnyUrl, BeforeValidator, computed_field
+from pydantic import AnyHttpUrl, EmailStr, AnyUrl, BeforeValidator, computed_field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from dotenv import load_dotenv
 
@@ -18,7 +18,6 @@ def parse_cors(v: Any) -> list[str] | str:
 
 
 class Settings(BaseSettings):
-
     model_config = SettingsConfigDict(
         # Use top level .env file (one level above ./backend/)
         env_file="../.env",
@@ -57,6 +56,19 @@ class Settings(BaseSettings):
     USERS_OPEN_REGISTRATION: bool = False
 
     REDIS_BROKER_URL: str | None = None
+
+    # 文件上传
+    UPLOAD_DIR: Path
+    MAX_FILE_SIZE: int = 1024 * 1024 * 10  # 10MB
+    ALLOWED_TYPES: list[str] = ["image/jpeg", "application/pdf"]
+
+    @field_validator("UPLOAD_DIR")
+    def validate_upload_dir(cls, value: Path) -> Path:
+        if not value.exists():
+            value.mkdir(parents=True)
+        if not value.is_dir():
+            raise ValueError("Must be a directory")
+        return value.resolve()
 
 
 settings = Settings()
