@@ -1,9 +1,12 @@
+from collections.abc import Generator
 import uuid
 from typing import Any
 import shutil
 
 from fastapi import APIRouter, File, Form, UploadFile, HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import StreamingResponse
+from fastapi_pagination import Page
+from fastapi_pagination.ext.sqlmodel import paginate
 from sqlmodel import select
 
 from app.models import UploadedFile
@@ -40,16 +43,19 @@ async def create_upload_file(session: SessionDep, file: UploadFile) -> Any:
     return upload_file
 
 
-@router.get("/upload-file/", tags=["File"], response_model=list[schemas.UploadFile])
+@router.get("/upload-file/", tags=["File"], response_model=Page[schemas.UploadFile])
 def get_upload_files(session: SessionDep) -> Any:
     query = select(UploadedFile)
-    return session.exec(query).all()
+
+    return paginate(session, query)
 
 
 @router.get("/upload-file/{file_id}", tags=["File"])
 def download_file(file_id: uuid.UUID, session: SessionDep) -> Any:
     query = select(UploadedFile).where(UploadedFile.id == file_id)
-    upload_file = session.exec(query).one()
+    upload_file = session.exec(query).first()
+    if not upload_file:
+        raise HTTPException(status_code=404, detail="文件不存在")
     file_path = settings.UPLOAD_DIR / upload_file.filepath / str(upload_file.id)
 
     if not file_path.exists():
@@ -57,7 +63,12 @@ def download_file(file_id: uuid.UUID, session: SessionDep) -> Any:
         session.commit()
         raise HTTPException(status_code=404, detail="文件不存在或已删除")
 
-    return FileResponse(path=file_path, filename=upload_file.filename, media_type=upload_file.content_type)
+    def iterfile() -> Generator[bytes]:
+        with file_path.open("rb") as f:
+            yield from f
+
+    # return FileResponse(path=file_path, filename=upload_file.filename, media_type=upload_file.content_type)
+    return StreamingResponse(iterfile(), media_type=upload_file.content_type)
 
 
 @router.post("/upload-file-form/", tags=["File"], response_model=schemas.FileForm)
