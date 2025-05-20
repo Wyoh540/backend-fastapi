@@ -1,17 +1,14 @@
-from collections.abc import Generator
 import uuid
 from typing import Any
-import shutil
 
-from fastapi import APIRouter, File, Form, UploadFile, HTTPException
-from fastapi.responses import StreamingResponse
+from fastapi import APIRouter, File, Form, UploadFile
 from fastapi_pagination import Page
 from fastapi_pagination.ext.sqlmodel import paginate
 from sqlmodel import select
 
 from app.models import UploadedFile
 from app.api.deps import SessionDep
-from app.core.config import settings
+from app.services.file import FileService
 from app import schemas
 
 router = APIRouter()
@@ -27,18 +24,7 @@ async def create_file(file: bytes = File()) -> Any:
 async def create_upload_file(session: SessionDep, file: UploadFile) -> Any:
     """使用UploadFile()上传文件, 适用于图像、视频、二进制文件等大型文件, 可获取上传文件的元数据"""
 
-    upload_file = UploadedFile(filename=file.filename, file_size=file.size, content_type=file.content_type)
-    file_path = settings.UPLOAD_DIR / upload_file.filepath / str(upload_file.id)
-
-    # 安全验证：确保路径在指定的目录内
-    if not file_path.resolve().parent.samefile(settings.UPLOAD_DIR):
-        raise HTTPException(status_code=403, detail="Invalid upload directory")
-
-    with file_path.open("wb") as f:
-        shutil.copyfileobj(file.file, f)
-    session.add(upload_file)
-    session.commit()
-    session.refresh(upload_file)
+    upload_file = FileService.save_file(session, file=file)
 
     return upload_file
 
@@ -52,23 +38,7 @@ def get_upload_files(session: SessionDep) -> Any:
 
 @router.get("/upload-file/{file_id}", tags=["File"])
 def download_file(file_id: uuid.UUID, session: SessionDep) -> Any:
-    query = select(UploadedFile).where(UploadedFile.id == file_id)
-    upload_file = session.exec(query).first()
-    if not upload_file:
-        raise HTTPException(status_code=404, detail="文件不存在")
-    file_path = settings.UPLOAD_DIR / upload_file.filepath / str(upload_file.id)
-
-    if not file_path.exists():
-        session.delete(upload_file)
-        session.commit()
-        raise HTTPException(status_code=404, detail="文件不存在或已删除")
-
-    def iterfile() -> Generator[bytes]:
-        with file_path.open("rb") as f:
-            yield from f
-
-    # return FileResponse(path=file_path, filename=upload_file.filename, media_type=upload_file.content_type)
-    return StreamingResponse(iterfile(), media_type=upload_file.content_type)
+    return FileService.download_file(session, file_id=file_id)
 
 
 @router.post("/upload-file-form/", tags=["File"], response_model=schemas.FileForm)
@@ -81,3 +51,11 @@ async def create_file_with_form(
         "token": token,
         "fileb_content_type": fileb.content_type if fileb else None,
     }
+
+
+@router.delete("/upload-file/{file_id}", tags=["File"])
+def delete_file(file_id: uuid.UUID, session: SessionDep) -> Any:
+    """删除上传的文件"""
+    FileService.delete_file(session, file_id=file_id)
+
+    return {"detail": "文件已成功删除"}
