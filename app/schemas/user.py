@@ -7,12 +7,12 @@ class UserBase(SQLModel):
     email: EmailStr | None = None
     is_active: bool = True
     is_superuser: bool = False
-    full_name: str | None = None
+    username: str | None = None
 
 
 # Properties to receive via API on creation
 class UserCreate(UserBase):
-    email: EmailStr
+    username: str
     password: str
 
 
@@ -22,7 +22,7 @@ class UserUpdate(UserBase):
 
 
 class UserInDBBase(UserBase):
-    id: int | int = None
+    id: int | None = None
 
 
 # Additional properties to return via API
@@ -40,7 +40,7 @@ class UserPubic(SQLModel):
     email: EmailStr | None = None
     is_active: bool = True
     is_superuser: bool = False
-    full_name: str | None = None
+    username: str | None = None
 
 
 class UsersPublic(SQLModel):

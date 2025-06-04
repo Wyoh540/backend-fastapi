@@ -5,16 +5,17 @@ from app.models.user import User
 from app.schemas.user import UserCreate
 from app.services.user import UserManage
 
-connect_args = {"check_same_thread": False}  # 仅SQLite 配置，不同线程中使用同一个数据库
-engine = create_engine(settings.SQLALCHEMY_DATABASE_URI, connect_args=connect_args)
+engine_uri = settings.SQLALCHEMY_DATABASE_URI
+
+connection_args = {"check_same_thread": True} if "sqlite" in engine_uri else {}
+engine = create_engine(engine_uri, connect_args=connection_args)
 
 
 def init_db(session: Session) -> None:
-
     user = session.exec(select(User).where(User.email == settings.FIRST_SUPERUSER)).first()
     if not user:
         user_in = UserCreate(
-            email=settings.FIRST_SUPERUSER,
+            username=settings.FIRST_SUPERUSER,
             password=settings.FIRST_SUPERUSER_PASSWORD,
             is_superuser=True,
         )

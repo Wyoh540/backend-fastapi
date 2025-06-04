@@ -10,8 +10,8 @@ if TYPE_CHECKING:
 
 class User(SQLModel, table=True):
     id: int | None = Field(primary_key=True, default=None)
-    full_name: str | None = Field(max_length=255, default=None)
-    email: EmailStr = Field(max_length=255, index=True, unique=True)
+    username: str = Field(max_length=255, index=True, unique=True)
+    email: EmailStr | None = Field(max_length=255, index=True, unique=True)
     hashed_password: str
     is_active: bool = True
     is_superuser: bool = False
