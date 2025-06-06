@@ -19,4 +19,4 @@ def init_db(session: Session) -> None:
             password=settings.FIRST_SUPERUSER_PASSWORD,
             is_superuser=True,
         )
-        user = UserManage(session).create_user(user_create=user_in)
+        user = UserManage.create_user(session, user_create=user_in)

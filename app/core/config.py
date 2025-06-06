@@ -50,7 +50,7 @@ class Settings(BaseSettings):
     # mysql: mysql+pymysql://user:password@hostname:port/db
     SQLALCHEMY_DATABASE_URI: str
 
-    EMAIL_TEST_USER: EmailStr = "test@example.com"
+    TEST_USER: str = "test"
     FIRST_SUPERUSER: str = "admin"
     FIRST_SUPERUSER_PASSWORD: str = "admin"
     USERS_OPEN_REGISTRATION: bool = False

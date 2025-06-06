@@ -24,3 +24,9 @@ dependencies = [
 [tool.mypy]
 strict = true
 exclude = ["venv", ".venv", "app/alembic"]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.0",
+    "pytest-cov>=6.1.1",
+]

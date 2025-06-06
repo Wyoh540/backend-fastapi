@@ -1,7 +1,7 @@
-from sqlmodel import SQLModel, Field, Column, Integer
+from sqlmodel import SQLModel, Field
 from pydantic import model_serializer
 
-from app.schemas.user import UserPubic
+from app.schemas.user import UserPublic
 from app.models import ItemBase, ItemStatus
 
 
@@ -16,9 +16,7 @@ class ItemUpdate(SQLModel):
     title: str | None = Field(default=None, max_length=255)
     tags: list[str] = []
 
-    status: ItemStatus = Field(
-        sa_column=Column(Integer), default=ItemStatus.ONLINE.value, description="1: 在线, 2: 离线"
-    )
+    status: ItemStatus = Field(default=ItemStatus.ONLINE, description="1: 在线, 2: 离线")
 
 
 # Properties shared by models stored in DB
@@ -29,7 +27,7 @@ class ItemInDBBase(ItemBase):
 
 # Properties to return to client
 class ItemPublic(ItemInDBBase):
-    owner: UserPubic
+    owner: UserPublic
     tags: list["TagName"]
 
     # @field_serializer("tags")  # 字段序列化

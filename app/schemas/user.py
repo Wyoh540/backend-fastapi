@@ -35,7 +35,7 @@ class UserInDB(UserInDBBase):
     hashed_password: str
 
 
-class UserPubic(SQLModel):
+class UserPublic(SQLModel):
     id: int | None = None
     email: EmailStr | None = None
     is_active: bool = True
@@ -44,4 +44,4 @@ class UserPubic(SQLModel):
 
 
 class UsersPublic(SQLModel):
-    data: list[UserPubic]
+    data: list[UserPublic]
