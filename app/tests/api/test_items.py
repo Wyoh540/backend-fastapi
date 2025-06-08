@@ -1,5 +1,6 @@
 import pytest
 from fastapi.testclient import TestClient
+from faker import Faker
 
 from app.tests.utils.utils import random_lower_string
 from app.core.config import settings
@@ -10,10 +11,11 @@ API_PREFIX = settings.API_V1_STR
 
 @pytest.fixture
 def item_data():
+    fake = Faker()
     return {
-        "title": random_lower_string(8),
-        "description": random_lower_string(16),
-        "tags": [random_lower_string(5), random_lower_string(5)],
+        "title": fake.word(),
+        "description": fake.text(max_nb_chars=32),
+        "tags": [fake.word(), fake.word()],
     }
 
 
