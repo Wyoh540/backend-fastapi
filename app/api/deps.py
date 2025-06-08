@@ -41,13 +41,22 @@ def get_current_user(session: SessionDep, token: TokenDep) -> User:
         raise HTTPException(status_code=404, detail="User not found")
     if not user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
+    # 校验token签发时间与用户last_password_change
+    token_iat = token_data.iat
+    last_password_change = getattr(user, "last_password_change", None)
+    print(f"Token issued at: {token_iat}, Last password change: {last_password_change}")
+    if last_password_change and token_iat and int(token_iat) < int(last_password_change):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token expired due to password change")
     return user
 
 
 CurrentUser = Annotated[User, Depends(get_current_user)]
 
 
-# def get_current_active_superuser(current_user: CurrentUser) -> User:
-#     if not current_user.is_superuser:
-#         raise HTTPException(status_code=403, detail="The user doesn't have enough privileges")
-#     return current_user
+def get_current_active_superuser(current_user: CurrentUser) -> User:
+    if not current_user.is_superuser:
+        raise HTTPException(status_code=403, detail="The user doesn't have enough privileges")
+    return current_user
+
+
+SuperUser = Annotated[User, Depends(get_current_active_superuser)]

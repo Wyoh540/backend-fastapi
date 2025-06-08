@@ -15,6 +15,7 @@ class User(SQLModel, table=True):
     hashed_password: str
     is_active: bool = True
     is_superuser: bool = False
+    last_password_change: int | None = Field(default=None, description="上次密码修改时间戳")
 
     # cascade_delete 字段作用在Relationship上，在一对多关系的"多"侧，级联删除时使用，"一"侧的Field中需ondelete="CASCADE"
     # 如果"一"侧的Field中ondelete="SET NULL", 则cascade_delete不需要配置

@@ -45,3 +45,7 @@ class UserPublic(SQLModel):
 
 class UsersPublic(SQLModel):
     data: list[UserPublic]
+
+
+class NewPassword(SQLModel):
+    new_password: str

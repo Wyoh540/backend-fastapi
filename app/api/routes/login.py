@@ -28,5 +28,9 @@ def login_access_token(
     access_token_expire = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
 
     return schemas.Token(
-        access_token=security.create_access_token(user.id, expires_delta=access_token_expire),
+        access_token=security.create_access_token(
+            user.id,
+            expires_delta=access_token_expire,
+            last_password_change=user.last_password_change
+        ),
     )

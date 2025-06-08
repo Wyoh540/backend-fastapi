@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sqlmodel import Session, select
 
 from app.schemas.user import UserCreate, UserUpdate
@@ -24,11 +26,19 @@ class UserManage:
         for key, value in user_data.items():
             setattr(db_obj, key, value)
         if "password" in user_data:
-            db_obj.hashed_password = get_password_hash(user_data["password"])
+            cls.change_password(db_obj, user_data["password"])
         session.add(db_obj)
         session.commit()
         session.refresh(db_obj)
         return db_obj
+
+    @classmethod
+    def change_password(cls, user: User, new_password: str) -> User:
+        """变更用户密码"""
+        user.hashed_password = get_password_hash(new_password)
+        user.last_password_change = int(datetime.now().timestamp())
+
+        return user
 
     @classmethod
     def get_user_by_username(cls, session: Session, username: str) -> User | None:

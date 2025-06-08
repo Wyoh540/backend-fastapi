@@ -8,4 +8,5 @@ class Token(SQLModel):
 
 class TokenPayload(SQLModel):
     sub: int | None = None
+    iat: int | None = None
     scopes: list[str] = []

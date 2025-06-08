@@ -1,7 +1,7 @@
 from sqlmodel import Session, select
 
 from app.models import User
-from app.core.security import verify_password
+from app.core.security import verify_password, get_password_hash
 
 
 def get_user_by_email(*, session: Session, email: str) -> User | None:
@@ -23,3 +23,11 @@ def authenticate(*, session: Session, username: str, password: str) -> User | No
     if not verify_password(password, db_user.hashed_password):
         return None
     return db_user
+
+
+def change_password(*, session: Session, user: User, new_password: str) -> None:
+    """变更用户密码"""
+    user.hashed_password = get_password_hash(new_password)
+    session.add(user)
+    session.commit()
+    session.refresh(user)

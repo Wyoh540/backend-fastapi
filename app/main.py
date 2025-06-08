@@ -26,6 +26,12 @@ app = FastAPI(
     redoc_url=None,
 )
 
+
+@app.get("/", include_in_schema=False)
+def hello() -> str:
+    return f"Hello, {settings.PROJECT_NAME}!"
+
+
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 

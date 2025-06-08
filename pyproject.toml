@@ -30,4 +30,5 @@ dev = [
     "faker>=37.3.0",
     "pytest>=8.4.0",
     "pytest-cov>=6.1.1",
+    "types-passlib>=1.7.7.20250602",
 ]
