@@ -29,7 +29,7 @@ def create_user(session: SessionDep, user_in: UserCreate, current_user: SuperUse
 
 
 @router.patch("/{user_id}", response_model=UserPublic)
-def update_user(session: SessionDep, user_id: int, user_in: UserUpdate, current_user: SuperUser) -> User:
+def update_user(session: SessionDep, user_id: int, user_in: UserUpdate) -> User:
     """Update user details."""
     user = session.get(User, user_id)
     if not user:

@@ -23,10 +23,13 @@ class UserManage:
     def update_user(cls, session: Session, db_obj: User, user_update: UserUpdate) -> User:
         """更新用户"""
         user_data = user_update.model_dump(exclude_unset=True)
+        if "password" in user_data:
+            password = user_data.pop("password")
+            cls.change_password(db_obj, password)
+
         for key, value in user_data.items():
             setattr(db_obj, key, value)
-        if "password" in user_data:
-            cls.change_password(db_obj, user_data["password"])
+
         session.add(db_obj)
         session.commit()
         session.refresh(db_obj)
