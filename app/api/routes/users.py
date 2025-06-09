@@ -40,6 +40,17 @@ def update_user(session: SessionDep, user_id: int, user_in: UserUpdate) -> User:
     return user
 
 
+@router.delete("/{user_id}", response_model=None, status_code=204)
+def delete_user(session: SessionDep, user_id: int) -> None:
+    """Delete a user."""
+    user = session.get(User, user_id)
+    if not user:
+        raise ValueError(f"User with id {user_id} not found")
+
+    session.delete(user)
+    session.commit()
+
+
 @router.get("/me", response_model=UserPublic)
 def get_user_me(current_user: CurrentUser) -> Any:
     return current_user

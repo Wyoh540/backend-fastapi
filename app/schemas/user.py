@@ -17,7 +17,10 @@ class UserCreate(UserBase):
 
 
 # Properties to receive via API on update
-class UserUpdate(UserBase):
+class UserUpdate(SQLModel):
+    email: EmailStr | None = None
+    is_active: bool | None = None
+    is_superuser: bool | None = None
     password: str | None = None
 
 

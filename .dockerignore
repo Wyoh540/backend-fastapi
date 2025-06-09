@@ -6,3 +6,5 @@
 .env
 uploads
 sql_app.db
+
+.coverage

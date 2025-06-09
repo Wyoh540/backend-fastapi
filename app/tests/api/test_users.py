@@ -23,6 +23,20 @@ def superuser_token_headers():
     return headers
 
 
+@pytest.fixture
+def user_for_test(superuser_token_headers):
+    data = {
+        "username": fake.user_name(),
+        "email": fake.email(),
+        "password": fake.password(length=12),
+    }
+    create_resp = client.post(f"{API_PREFIX}/users/", json=data, headers=superuser_token_headers)
+    user = create_resp.json()
+    yield user  # 测试用例中可直接使用 user
+    # 测试后自动删除该用户
+    client.delete(f"{API_PREFIX}/users/{user['id']}", headers=superuser_token_headers)
+
+
 def test_create_user(superuser_token_headers):
     data = {
         "username": fake.user_name(),
@@ -32,8 +46,12 @@ def test_create_user(superuser_token_headers):
     response = client.post(f"{API_PREFIX}/users/", json=data, headers=superuser_token_headers)
     assert response.status_code == 200
     user = response.json()
-    assert user["username"] == data["username"]
-    assert user["email"] == data["email"]
+    try:
+        assert user["username"] == data["username"]
+        assert user["email"] == data["email"]
+    finally:
+        # 测试结束后删除该用户
+        client.delete(f"{API_PREFIX}/users/{user['id']}", headers=superuser_token_headers)
 
 
 def test_get_users(superuser_token_headers):
@@ -43,22 +61,23 @@ def test_get_users(superuser_token_headers):
     assert isinstance(users, list)
 
 
-def test_update_user(superuser_token_headers):
-    # 先创建用户
-    data = {
-        "username": fake.user_name(),
-        "email": fake.email(),
-        "password": fake.password(length=12),
-    }
-    create_resp = client.post(f"{API_PREFIX}/users/", json=data, headers=superuser_token_headers)
-    user_id = create_resp.json()["id"]
-    update_data = {"username": fake.user_name()}
+def test_update_user(superuser_token_headers, user_for_test):
+    user_id = user_for_test["id"]
+    update_data = {"email": fake.email()}
     response = client.patch(f"{API_PREFIX}/users/{user_id}", json=update_data, headers=superuser_token_headers)
     assert response.status_code == 200
-    assert response.json()["username"] == update_data["username"]
+    # 用户名未变，邮箱已更新
+    assert response.json()["email"] == update_data["email"]
+    assert response.json()["username"] == user_for_test["username"]
 
 
 def test_get_me(superuser_token_headers):
     response = client.get(f"{API_PREFIX}/users/me", headers=superuser_token_headers)
     assert response.status_code == 200
     assert "username" in response.json()
+
+
+def test_delete_user(superuser_token_headers, user_for_test):
+    user_id = user_for_test['id']
+    response = client.delete(f"{API_PREFIX}/users/{user_id}", headers=superuser_token_headers)
+    assert response.status_code == 204
