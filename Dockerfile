@@ -1,4 +1,4 @@
-FROM python:3.10-slim
+FROM python:3.10-slim-bullseye
 
 ENV PYTHONUNBUFFERED=1
 
@@ -17,7 +17,8 @@ ENV PATH="/app/.venv/bin:$PATH"
 ENV PYTHONPATH=/app
 
 # Copy the application into the container.
-COPY . /app
+COPY ./app /app/app
+COPY ./pyproject.toml ./uv.lock ./alembic.ini ./scripts ./static /app/
 
 # Install the application dependencies.
 RUN uv sync --frozen --no-cache
