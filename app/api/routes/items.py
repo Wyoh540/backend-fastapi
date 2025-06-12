@@ -26,7 +26,6 @@ def get_items(session: SessionDep, item_filter: ItemFilter = FilterDepends(ItemF
 
 @router.post("/", response_model=ItemPublic)
 def create_item(session: SessionDep, current_user: CurrentUser, item_obj: ItemCreate) -> Any:
-    # item = Item.model_validate(item_obj, update={"owner_id": current_user.id})
     item_tag_list = []
     for tag in item_obj.tags:
         tag_obj = TagManage.get_or_create_tag(db=session, tag_name=tag)

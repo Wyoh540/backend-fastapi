@@ -30,10 +30,6 @@ class ItemPublic(ItemInDBBase):
     owner: UserPublic
     tags: list["TagName"]
 
-    # @field_serializer("tags")  # 字段序列化
-    # def serialize_tags(self, tags: "TagName"):
-    #     return [tag.name for tag in tags]
-
 
 class ItemList(SQLModel):
     data: list[ItemPublic]

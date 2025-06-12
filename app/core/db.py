@@ -12,6 +12,7 @@ engine = create_engine(engine_uri, connect_args=connection_args)
 
 
 def init_db(session: Session) -> None:
+    """初始化数据库，创建表格并添加默认超级用户。"""
     user = session.exec(select(User).where(User.email == settings.FIRST_SUPERUSER)).first()
     if not user:
         user_in = UserCreate(
@@ -19,4 +20,4 @@ def init_db(session: Session) -> None:
             password=settings.FIRST_SUPERUSER_PASSWORD,
             is_superuser=True,
         )
-        user = UserManage.create_user(session, user_create=user_in)
+        UserManage.create_user(session, user_create=user_in)

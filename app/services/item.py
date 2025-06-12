@@ -25,7 +25,7 @@ class ItemService:
     """Item 服务"""
 
     @classmethod
-    def get_item_by_id(cla, db: Session, item_id: int) -> Item:
+    def get_item_by_id(cls, db: Session, item_id: int) -> Item:
         """获取Item"""
         db_item = db.get(Item, item_id)
         if not db_item:
