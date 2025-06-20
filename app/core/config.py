@@ -1,7 +1,7 @@
 from typing import Literal, Any, Annotated
 from pathlib import Path
 
-from pydantic import AnyHttpUrl, EmailStr, AnyUrl, BeforeValidator, computed_field, field_validator
+from pydantic import AnyUrl, BeforeValidator, computed_field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from dotenv import load_dotenv
 
@@ -70,5 +70,11 @@ class Settings(BaseSettings):
             raise ValueError("Must be a directory")
         return value.resolve()
 
+    # GitHub OAuth
+    GITHUB_CLIENT_ID: str = ""
+    GITHUB_AUTH_URL: str = "https://github.com/login/oauth/authorize"
+    GITHUB_CLIENT_SECRET: str = ""
+    GITHUB_CALLBACK_URL: str = "http://localhost:8000/api/v1/login/github/callback"
 
-settings = Settings()
+
+settings = Settings()  # type: ignore

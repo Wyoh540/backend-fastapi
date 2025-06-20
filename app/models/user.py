@@ -1,5 +1,4 @@
-from typing import TYPE_CHECKING
-
+from typing import TYPE_CHECKING, Optional
 from sqlmodel import SQLModel, Relationship, Field
 from pydantic import EmailStr
 
@@ -10,14 +9,20 @@ if TYPE_CHECKING:
 
 class User(SQLModel, table=True):
     id: int | None = Field(primary_key=True, default=None)
-    username: str = Field(max_length=255, index=True, unique=True)
+    nickname: str | None = Field(max_length=255, index=True)
     email: EmailStr | None = Field(max_length=255, index=True, unique=True)
-    hashed_password: str
+    avatar: str | None = None
     is_active: bool = True
     is_superuser: bool = False
-    last_password_change: int | None = Field(default=None, description="上次密码修改时间戳")
-
-    # cascade_delete 字段作用在Relationship上，在一对多关系的"多"侧，级联删除时使用，"一"侧的Field中需ondelete="CASCADE"
-    # 如果"一"侧的Field中ondelete="SET NULL", 则cascade_delete不需要配置
-    # 详细说明查看：https://sqlmodel.tiangolo.com/tutorial/relationship-attributes/cascade-delete-relationships/
+    auths: list["UserAuth"] = Relationship(back_populates="user")
     items: list["Item"] = Relationship(back_populates="owner", cascade_delete=True)
+
+
+class UserAuth(SQLModel, table=True):
+    id: int | None = Field(primary_key=True, default=None)
+    user_id: int = Field(foreign_key="user.id")
+    auth_type: str = Field(max_length=32, index=True)  # 'password', 'github', 'wechat', etc.
+    identifier: str = Field(max_length=255, index=True)  # username/email/openid/github_id等
+    credential: str  # 密码hash或第三方token等
+    last_password_change: int | None = Field(default=None, description="上次密码修改时间戳，仅password方式用")
+    user: Optional[User] = Relationship(back_populates="auths")
