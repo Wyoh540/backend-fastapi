@@ -2,7 +2,6 @@ import pytest
 from fastapi.testclient import TestClient
 from faker import Faker
 
-from app.tests.utils.utils import random_lower_string
 from app.core.config import settings
 
 
@@ -38,7 +37,8 @@ def test_update_item(client: TestClient, superuser_token_headers, item_data):
     # 先创建一个item
     create_resp = client.post(f"{API_PREFIX}/items/", json=item_data, headers=superuser_token_headers)
     item_id = create_resp.json()["id"]
-    update_data = {"title": random_lower_string(10), "tags": [random_lower_string(5)]}
+    fake = Faker()
+    update_data = {"title": fake.word(), "tags": [fake.word()]}
     response = client.patch(f"{API_PREFIX}/items/{item_id}", json=update_data, headers=superuser_token_headers)
     assert response.status_code == 200
     data = response.json()
