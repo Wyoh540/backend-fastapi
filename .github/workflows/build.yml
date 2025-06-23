@@ -9,9 +9,6 @@ jobs:
   sonarqube:
     name: SonarQube
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python: [3.10]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -19,7 +16,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: ${{ matrix.python }}
+          python-version: 3.10
       - name: Install tox and any other packages
         run: pip install tox
       - name: Run tox
