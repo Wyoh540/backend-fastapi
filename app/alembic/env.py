@@ -77,7 +77,7 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(connection=connection, target_metadata=target_metadata, compare_type=True)
+        context.configure(connection=connection, target_metadata=target_metadata, compare_type=True, render_as_batch=True)
         # render_as_batch=True allows autogenerate to create "batch" migrations, which are useful for SQLite and other databases that do not support deferrable constraints.
         with context.begin_transaction():
             context.run_migrations()

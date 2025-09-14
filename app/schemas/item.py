@@ -2,31 +2,31 @@ from sqlmodel import SQLModel, Field
 from pydantic import model_serializer
 
 from app.schemas.user import UserPublic
-from app.models import ItemBase, ItemStatus
+from app.models import ItemStatus
 
 
 # Properties to receive on item creation
-class ItemCreate(ItemBase):
+class ItemCreate(SQLModel):
     title: str
     tags: list[str] = []
+    description: str | None = Field(default=None, max_length=1024)
 
 
 # Properties to receive on item update
 class ItemUpdate(SQLModel):
     title: str | None = Field(default=None, max_length=255)
     tags: list[str] = []
+    description: str | None = Field(default=None, max_length=1024)
 
     status: ItemStatus = Field(default=ItemStatus.ONLINE, description="1: 在线, 2: 离线")
 
 
-# Properties shared by models stored in DB
-class ItemInDBBase(ItemBase):
+# Properties to return to client
+class ItemPublic(SQLModel):
     id: int
     title: str
-
-
-# Properties to return to client
-class ItemPublic(ItemInDBBase):
+    status: ItemStatus
+    description: str | None = None
     owner: UserPublic
     tags: list["TagName"]
 

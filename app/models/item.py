@@ -1,6 +1,6 @@
 from enum import Enum
 
-from sqlmodel import SQLModel, Field, Relationship
+from sqlmodel import SQLModel, Field, Relationship, Integer, Column, Text
 from .user import User
 
 
@@ -18,15 +18,12 @@ class ItemStatus(int, Enum):
     OFFLINE = 2
 
 
-class ItemBase(SQLModel):
-    title: str = Field(max_length=255)
-
-    status: ItemStatus = Field(default=ItemStatus.ONLINE, description="1: 在线, 2: 离线")
-
-
-class Item(ItemBase, table=True):
+class Item(SQLModel, table=True):
     id: int | None = Field(primary_key=True, default=None)
 
+    title: str = Field(max_length=255)
+    status: ItemStatus = Field(default=ItemStatus.ONLINE, sa_column=Column(Integer), description="1: 在线, 2: 离线")
+    description: str | None = Field(default=None, sa_column=Column(Text), max_length=1024)
     # ondelete="CASCADE" 表示数据库级联删除, 在Field中使用，在一对多关系的多侧
     owner_id: int = Field(foreign_key="user.id", nullable=False, ondelete="CASCADE")
     owner: User | None = Relationship(back_populates="items")

@@ -7,7 +7,7 @@ from app.services.user import UserManage
 
 engine_uri = settings.SQLALCHEMY_DATABASE_URI
 
-connection_args = {"check_same_thread": True} if "sqlite" in engine_uri else {}
+connection_args = {"check_same_thread": False} if "sqlite" in engine_uri else {}
 engine = create_engine(engine_uri, connect_args=connection_args)
 
 
